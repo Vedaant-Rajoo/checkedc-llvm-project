@@ -1507,7 +1507,9 @@ ClangdLSPServer::ClangdLSPServer(class Transport &Transp,
       MsgHandler(new MessageHandler(*this)), TFS(TFS),
       SupportedSymbolKinds(defaultSymbolKinds()),
       SupportedCompletionItemKinds(defaultCompletionItemKinds()), Opts(Opts)
+#ifdef LSP3C
       , _3CInter(_3CInterface)
+#endif
 {
   if (Opts.ConfigProvider) {
     assert(!Opts.ContextProvider &&

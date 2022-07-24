@@ -23,8 +23,13 @@ static bool IsValidSourceFile(ConstraintsInfo &CCRes, std::string &FilePath) {
   return CCRes.ValidSourceFiles.find(FilePath) != CCRes.ValidSourceFiles.end();
 }
 
-bool _3CDiagnostics::PopulateDiagsFromConstraintsInfo(ConstraintsInfo &Line) {
+Constraints getConstraints(_3CInterface &Interface){
+  return Interface.GlobalProgramInfo.getConstraints();
+}
+
+bool _3CDiagnostics::PopulateDiagsFromInterface(_3CInterface &Interface){
   std::lock_guard<std::mutex> Lock(DiagMutex);
+  auto Line = Interface.getWildPtrsInfo();
   std::set<ConstraintKey> ProcessedCKeys;
   ProcessedCKeys.clear();
   int i=0;
@@ -58,10 +63,11 @@ bool _3CDiagnostics::PopulateDiagsFromConstraintsInfo(ConstraintsInfo &Line) {
       NewDiag.Range = GetLocRange(PsInfo.getLineNo(), PsInfo.getColSNo()-1,
                                   PsInfo.getColENo());
       NewDiag.Source = Diag::Main3C;
+      NewDiag.Name = Interface.GlobalProgramInfo.getConstraints().getVar(WReason.first)->getStr();
       NewDiag.Severity = DiagnosticsEngine::Level::Error;
       NewDiag.code = std::to_string(WReason.first);
       NewDiag.Message =
-          "Pointer is wild because of :" + WReason.second.getReason();
+          NewDiag.Name+" is wild because of :" + WReason.second.getReason();
 
       // Create notes for the information about root cause.
       PersistentSourceLoc SL = WReason.second.getLocation();

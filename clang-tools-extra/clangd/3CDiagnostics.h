@@ -14,6 +14,7 @@
 
 #include <set>
 #include "Diagnostics.h"
+#include "clang/3C/Constraints.h"
 #include "clang/3C/3C.h"
 
 namespace clang {
@@ -26,7 +27,9 @@ public:
 
   // GUARDED by DiagMutex
   // Populate diagnostics from the given disjoint set.
-  bool PopulateDiagsFromConstraintsInfo(ConstraintsInfo &Line);
+  bool PopulateDiagsFromInterface(_3CInterface &Interface);
+
+  Constraints getConstraints(_3CInterface &Interface);
   // GUARDED by DiagMutex
   // Clear diagnostics of all files.
   void ClearAllDiags();

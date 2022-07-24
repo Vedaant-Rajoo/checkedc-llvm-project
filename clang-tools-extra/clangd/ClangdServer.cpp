@@ -243,11 +243,9 @@ void ClangdServer::execute3CCommand(_3CInterface &LSPInter,_3CLSPCallBack *TCCB)
     LSPInter.solveConstraints();
     LSPInter.CStateisclear=false;
     log("Completed Interface Run now move onto Diagnostics");
-    auto &E = LSPInter.getWildPtrsInfo();
-    log("Got Diagnostics!!");
-    DiagInfofor3C.PopulateDiagsFromConstraintsInfo(E);
+    DiagInfofor3C.PopulateDiagsFromInterface(LSPInter);
     TCCB->sendMessage("Populated Issues");
-    report3CDiagsForAllFiles(E, TCCB);
+    report3CDiagsForAllFiles(LSPInter.getWildPtrsInfo(), TCCB);
     log("Run Completed");
     LSPInter.CStateisclear=true;
 
@@ -267,7 +265,7 @@ void ClangdServer::secondrun3C(_3CInterface &LSPInter, _3CLSPCallBack *ConvCB) {
     log("Completed Interface Run now move onto Diagnostics");
     auto &E = LSPInter.getWildPtrsInfo();
     log("Got Diagnostics!!");
-    DiagInfofor3C.PopulateDiagsFromConstraintsInfo(E);
+    DiagInfofor3C.PopulateDiagsFromInterface(LSPInter);
     ConvCB->sendMessage("Populated Issues");
     report3CDiagsForAllFiles(E,ConvCB);
   };
@@ -293,14 +291,13 @@ void ClangdServer::execute3CFix(_3CInterface &LSPInter,ExecuteCommandParams Para
       LSPInter.writeAllConvertedFilesToDisk();
       this->DiagInfofor3C.ClearAllDiags();
       log("Done removing the constraint");
-      auto &NewInfo = LSPInter.getWildPtrsInfo();
-      this->DiagInfofor3C.PopulateDiagsFromConstraintsInfo(NewInfo);
+      this->DiagInfofor3C.PopulateDiagsFromInterface(LSPInter);
       log("3C calling call-back\n");
 /*
       ConvCB->_3CisDone(PtrFileName);
 */
       ConvCB->sendMessage("3C Updated new issues.");
-      report3CDiagsForAllFiles(NewInfo, ConvCB);
+      report3CDiagsForAllFiles(LSPInter.getWildPtrsInfo(), ConvCB);
     } else {
       ConvCB->sendMessage("3C constraint key already removed.");
     }

@@ -65,9 +65,8 @@ struct TypeParamConstraint {
     if (MainConstraint != nullptr && GenericAddition != nullptr &&
         GenericAddition->isSolutionChecked(E)) {
       return GenericAddition;
-    } else {
-      return MainConstraint;
     }
+    return MainConstraint;
   }
 };
 
